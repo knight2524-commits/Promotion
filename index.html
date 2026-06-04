@@ -106,7 +106,7 @@
 <body>
 <div class="container">
     <div class="header-rates">
-        <span style="color: #2e7d32;">📋 (주)KB-ONE 작업수입 가격설정 시스템 <span style="font-size:12px; color:#666; font-weight:normal;">가격 자동화 Assist</span></span>
+        <span style="color: #2e7d32;">📋 (주)KB-ONE 작업수입 가격설정 시스템 <span style="font-size:12px; color:#666; font-weight:normal;"> 현장영업 단가 자동화</span></span>
         <div class="login-area">
             <span id="adminTitle" style="font-weight: normal; font-size: 14px;">관리자: 석정주 과장</span>
             <button id="loginBtn" class="btn-login" onclick="toggleLogin()">로그인</button>
@@ -193,7 +193,7 @@
                 <div class="dyn-head">🔁 직수A↔B 연동 할인 엔진 <span style="font-size:11px; color:#888; font-weight:normal;">(직수B가 추가될수록 직수A 할인율 상승)</span></div>
                 <div class="dyn-grid">
                     <div class="dyn-cell"><label>상승 방식</label>
-                        <select id="cfgMode" disabled onchange="toggleModeParams();recalcAll()" style="width:165px;height:32px;border:1px solid #bbb;border-radius:5px;font-size:12px;">
+                        <select id="cfgMode" onchange="toggleModeParams();recalcAll()" style="width:165px;height:32px;border:1px solid #bbb;border-radius:5px;font-size:12px;">
                             <option value="amount">직수B 금액구간당 가산</option>
                             <option value="ratio">B비중(%) 단계 가산</option>
                         </select>
@@ -265,7 +265,8 @@
                 <tfoot><tr><td colspan="8">합 계</td><td id="pdfSumQty"></td><td>-</td><td>-</td><td id="pdfSumAmt"></td></tr></tfoot>
             </table>
             <div class="price-note">
-                <strong>[안내]</strong> 1. 본 표는 작업수입 공급 기준이며 적용기간 내 유효합니다. 공급단가 = 특약점가 × (1 − 할인율).<br>
+                <strong>[안내]</strong><br>
+                1. 본 표는 작업수입 공급 기준이며 적용기간 내 유효합니다. 공급단가 = 특약점가 × (1 − 할인율).<br>
                 2. <b>연동할인</b>: 직수B 품목이 함께 발주될수록 직수A 할인율이 상승 적용됩니다 (직수A·B 동시확판 장려).<br>
                 3. 특이사항: <span id="pdfNotes"></span>
             </div>
@@ -342,7 +343,7 @@ function toggleLogin(){
 }
 function updateAuthUI(){
   document.querySelectorAll('.btn-plus').forEach(b=>b.style.display=isLoggedIn?'inline-block':'none');
-  ['cfgMode','cfgUnit','cfgWidth','cfgStep','cfgCap'].forEach(id=>document.getElementById(id).disabled=!isLoggedIn);
+  ['cfgUnit','cfgWidth','cfgStep','cfgCap'].forEach(id=>document.getElementById(id).disabled=!isLoggedIn);
   if(document.getElementById('baseModal').style.display==='flex') renderBaseModalList();
 }
 
