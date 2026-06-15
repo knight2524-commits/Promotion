@@ -156,7 +156,6 @@
 </head>
 <body>
 
-<!-- 시스템 초기 접속 로그인 -->
 <div id="appLoginOverlay" class="modal-overlay" style="background: #e8f5e9; z-index: 99999;">
     <div class="modal-content" style="width: 320px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
         <h2 style="color: #2e7d32; margin-top:0;">단가 시스템 접속</h2>
@@ -183,7 +182,6 @@
                 <div class="input-group">
                     <label>거래처/대상</label>
                     <div class="input-wrapper">
-                        <!-- 거래처 자동완성 검색 -->
                         <div class="autocomplete-wrapper">
                             <input type="text" id="customer" placeholder="업체명 또는 거래처코드 검색" autocomplete="off" style="width:100%;">
                             <div id="customerDropdown" class="autocomplete-list"></div>
@@ -234,10 +232,7 @@
             </div>
 
             <div class="form-row">
-                <div class="input-group">
-                    <label>특약점가(원)</label>
-                    <div class="input-wrapper"><input type="text" id="specPrice" placeholder="발주코드 선택시 자동" readonly style="background:#f4f4f4;"></div>
-                </div>
+                <div style="flex: 1;"></div>
                 <div class="input-group">
                     <label>수량</label>
                     <div class="input-wrapper" style="gap:2px;">
@@ -248,7 +243,6 @@
                 </div>
             </div>
 
-            <!-- 신규: [지정]상품 전용 선택창 (Dropdown) -->
             <div class="form-row">
                 <div class="input-group">
                     <label>선택상품(지정)</label>
@@ -259,11 +253,9 @@
                     </div>
                 </div>
                 <div class="input-group">
-                    <label>수량</label>
-                    <div class="input-wrapper" style="gap:2px;">
-                        <button class="btn-public-plus" onclick="adjDesigQty(-1)" style="width:36px; background:#e0e0e0;">-</button>
-                        <input type="text" id="desigQty" value="1" data-base-qty="1" style="text-align:center; font-weight:bold; font-size:14px;" onblur="validateDesigQty()" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
-                        <button class="btn-public-plus" onclick="adjDesigQty(1)" style="width:36px; background:#e0e0e0;">+</button>
+                    <label>지정상품수량</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="desigQty" value="1" data-base-qty="1" style="text-align:center; font-weight:bold; font-size:14px; background:#f4f4f4; color:#8e24aa;" readonly>
                     </div>
                 </div>
             </div>
@@ -283,7 +275,6 @@
                 <button class="btn-action" onclick="addRecordRow()">▼ 하단 기록 (발주코드 추가)</button>
             </div>
 
-            <!-- 관리자 모드에서 끄면 일반인에게는 보이지 않게 되는 패널 -->
             <div class="dyn-panel" id="enginePanel">
                 <div class="dyn-head">
                     <div>🔁 수입↔국산 연동 할인 엔진 <span style="font-size:11px; color:#888; font-weight:normal;">(수입이 추가될수록 국산 할인율 상승)</span></div>
@@ -299,7 +290,6 @@
                             <option value="desig">[지정]상품 적용</option>
                         </select>
                     </div>
-                    <!-- 두 모드 모두 동일한 구간단위 계산 사용 -->
                     <div class="dyn-cell mode-amount"><label>구간단위(원)</label><input type="text" id="cfgUnit" value="100,000" disabled style="width:110px;" oninput="this.value=formatNumber(unformatNumber(this.value));recalcAll()"></div>
                     <div class="dyn-cell"><label>구간당 가산(%)</label><input type="text" id="cfgStep" value="1" disabled oninput="recalcAll()"></div>
                     <div class="dyn-cell"><label>국산/지정 할인상한(%)</label><input type="text" id="cfgCap" value="8" disabled oninput="recalcAll()"></div>
@@ -363,7 +353,6 @@
     </div>
 </div>
 
-<!-- 사용자 관리 모달 -->
 <div id="userManageModal" class="modal-overlay">
     <div class="modal-content" style="width: 400px;">
         <h3 style="margin-top:0; color:#E64A19;">👥 사용자(로그인) 관리</h3>
@@ -380,7 +369,6 @@
     </div>
 </div>
 
-<!-- PDF 출력용 -->
 <div id="pdfDocumentOverlay" class="modal-overlay">
     <div class="pdf-modal-content">
         <div id="pdfPrintArea" class="price-paper">
@@ -802,16 +790,13 @@ function onBrandPick(which){
 function fillCodes(value) {
     document.getElementById('codeSelect').value = '';
     document.getElementById('codeSearch').value = '';
-    document.getElementById('specPrice').value = '';
     document.getElementById('qty').value = '1';
     document.getElementById('qty').dataset.baseQty = '1';
     
     // 일반 조작 시 지정 선택창 강제 초기화
     const desigSel = document.getElementById('desigSelect');
     if(desigSel) desigSel.value = '';
-    document.getElementById('hGubun').value = '';
     document.getElementById('desigQty').value = '1';
-    document.getElementById('desigQty').dataset.baseQty = '1';
 
     if(value) {
         document.getElementById('codeSearch').placeholder = "발주코드/품명/규격 검색 (띄어쓰기 조합)";
@@ -830,24 +815,23 @@ function onDesigChange() {
         document.getElementById('brandB').value = '';
         document.getElementById('codeSelect').value = '';
         document.getElementById('codeSearch').value = '';
-        document.getElementById('specPrice').value = '';
         document.getElementById('qty').value = '1';
         document.getElementById('qty').dataset.baseQty = '1';
         
         const p = PRODUCTS.find(x => x.c === code);
         if(p) {
-            document.getElementById('hGubun').value = p.hGubun || '해당없음';
-            document.getElementById('desigQty').value = p.baseQty || 1; // R열 배수기준 적용
+            document.getElementById('desigQty').value = p.baseQty || 1; // R열 배수기준
             document.getElementById('desigQty').dataset.baseQty = p.baseQty || 1;
         }
     } else {
-        document.getElementById('hGubun').value = '';
         document.getElementById('desigQty').value = '1';
         document.getElementById('desigQty').dataset.baseQty = '1';
     }
 }
 
+// 안전한 배수 산출 로직
 function snapToMultiple(val, base) {
+    if(isNaN(val) || isNaN(base) || base <= 0) return 1;
     if(val < base) return base;
     const r = val % base;
     if(r !== 0) {
@@ -872,26 +856,10 @@ function validateMainQty() {
     inp.value = snapToMultiple(v, base);
 }
 
-function adjDesigQty(dir){
-  const inp = document.getElementById('desigQty');
-  const base = parseInt(inp.dataset.baseQty) || 1;
-  let v = parseInt(inp.value) || 0;
-  v += dir * base;
-  if(v < base) v = base;
-  inp.value = v;
-}
-function validateDesigQty() {
-    const inp = document.getElementById('desigQty');
-    const base = parseInt(inp.dataset.baseQty) || 1;
-    let v = parseInt(inp.value) || base;
-    inp.value = snapToMultiple(v, base);
-}
-
 function onCodeChange(){
   const code=document.getElementById('codeSelect').value;
   const p=PRODUCTS.find(x=>x.c===code);
   if(p){
-      document.getElementById('specPrice').value = formatNumber(p.pr);
       document.getElementById('qty').value = p.baseQty || 1;
       document.getElementById('qty').dataset.baseQty = p.baseQty || 1;
   }
@@ -929,7 +897,6 @@ function pickCodeSearch(code) {
   document.getElementById('codeResults').style.display='none';
   
   document.getElementById('desigSelect').value = '';
-  document.getElementById('hGubun').value = '';
   
   onCodeChange();
 }
@@ -958,7 +925,6 @@ function pickProduct(code){
       document.getElementById('brandB').value = '';
       document.getElementById('codeSelect').value = '';
       document.getElementById('codeSearch').value = '';
-      document.getElementById('specPrice').value = '';
       
       document.getElementById('desigSelect').value = code;
       onDesigChange();
@@ -976,7 +942,6 @@ function pickProduct(code){
   document.getElementById('codeSearch').value=`${p.c} · ${p.nm}`;
   
   document.getElementById('desigSelect').value = '';
-  document.getElementById('hGubun').value = '';
   
   onCodeChange();
   document.getElementById('quickResults').style.display='none';
@@ -1062,7 +1027,6 @@ function recalcAll(){
 }
 
 function toggleModeParams(){
-  // 두 방식 모두 금액 구간 가산방식이므로 동일하게 노출
   document.querySelectorAll('.mode-amount').forEach(e=>e.style.display='flex');
 }
 
@@ -1080,8 +1044,9 @@ function addRecordRow(){
   const p = PRODUCTS.find(x => x.c === code);
   if(!p) return alert('추가할 상품(일반 또는 지정)을 선택하세요.');
       
-  const qty = parseInt(qtyInput.value) || p.baseQty || 1;
+  const isDesig = p.g.includes('지정');
   const baseQty = p.baseQty || 1;
+  const qty = isDesig ? baseQty : (parseInt(qtyInput.value) || baseQty);
   
   if(Array.from(document.querySelectorAll('#tableBody tr')).some(tr=>tr.dataset.code===p.c)){
     if(!confirm('이미 등록된 발주코드입니다. 그래도 추가할까요?')) return;
@@ -1095,7 +1060,9 @@ function addRecordRow(){
   recalcAll(); applySearch();
   
   // 추가 후 수량만 리셋
-  qtyInput.value = p.baseQty || 1;
+  if(!isDesig) {
+      qtyInput.value = p.baseQty || 1;
+  }
 }
 
 function adjRowQty(btn, dir, base){
@@ -1124,6 +1091,16 @@ function insertRow(r){
 
   const badge=r.g.includes('수입')?'badge-S':(r.g.includes('국산')?'badge-K':(r.g.includes('지정')?'badge-D':'badge-G'));
   const bQty = r.baseQty || 1;
+  const isDesig = r.g.includes('지정');
+
+  // 지정상품은 수량을 고정(수정불가)되도록 처리
+  const qtyCell = isDesig 
+      ? `<input type="text" class="f-qty" value="${r.qty}" style="width:40px; text-align:center; background:transparent; border:none; font-weight:bold; color:#8e24aa;" readonly>`
+      : `<div style="display:flex; justify-content:center; gap:2px; align-items:center;">
+            <button class="btn-login" style="padding:2px 6px;" onclick="adjRowQty(this, -1, ${bQty})">-</button>
+            <input type="text" class="f-qty" value="${r.qty}" onblur="validateRowQty(this, ${bQty})" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:40px; text-align:center;">
+            <button class="btn-login" style="padding:2px 6px;" onclick="adjRowQty(this, 1, ${bQty})">+</button>
+        </div>`;
 
   tr.innerHTML=
     `<td><input type="radio" name="rowSelect"></td>`+
@@ -1134,13 +1111,7 @@ function insertRow(r){
     `<td style="text-align:left; padding-left:6px;">${r.nm}</td>`+
     `<td>${r.sp||''}</td>`+
     `<td style="text-align:right; padding-right:8px;">${formatNumber(r.pr)}</td>`+ 
-    `<td>
-        <div style="display:flex; justify-content:center; gap:2px; align-items:center;">
-            <button class="btn-login" style="padding:2px 6px;" onclick="adjRowQty(this, -1, ${bQty})">-</button>
-            <input type="text" class="f-qty" value="${r.qty}" onblur="validateRowQty(this, ${bQty})" oninput="this.value=this.value.replace(/[^0-9]/g,'')" style="width:40px; text-align:center;">
-            <button class="btn-login" style="padding:2px 6px;" onclick="adjRowQty(this, 1, ${bQty})">+</button>
-        </div>
-    </td>`+
+    `<td>${qtyCell}</td>`+
     `<td class="f-rate">0%</td>`+
     `<td class="calc f-supply">0</td>`+
     `<td class="amt f-amt">0</td>`;
@@ -1272,8 +1243,10 @@ function reloadMaster(e){
       // H열 데이터를 우선 파싱
       const rawH = String(o[colH] !== undefined ? o[colH] : '').trim(); 
       
+      // 빈 값이거나 0, NaN 등의 잘못된 값일 때 무조건 1로 강제보정하는 안전장치 적용
       const rawR = String(o[17] !== undefined ? o[17] : '').replace(/[^0-9.-]/g, '');
-      const baseQty = rawR === '' ? 1 : parseInt(rawR);
+      let baseQty = parseInt(rawR);
+      if(isNaN(baseQty) || baseQty <= 0) baseQty = 1;
       
       const rawS = String(o[18] !== undefined ? o[18] : '').replace(/[^0-9.-]/g, '');
       const baseSupply = rawS === '' ? pr : parseInt(rawS); 
@@ -1308,9 +1281,18 @@ function reloadMaster(e){
   e.target.value='';
 }
 
-/* PDF */
+/* PDF 출력 및 브랜드별 자동 정렬 로직 */
 function openPdfPopup(){
-  const rows=document.querySelectorAll('#tableBody tr'); if(!rows.length) return alert('기록된 행이 없습니다.');
+  const trs = Array.from(document.querySelectorAll('#tableBody tr')); 
+  if(!trs.length) return alert('기록된 행이 없습니다.');
+
+  // 브랜드명 기준으로 사전순 정렬
+  trs.sort((a, b) => {
+      const brA = a.dataset.br || '';
+      const brB = b.dataset.br || '';
+      return brA.localeCompare(brB, 'ko');
+  });
+
   document.getElementById('pdfCustName').innerText=document.getElementById('customer').value||'-';
   document.getElementById('pdfManager').innerText=document.getElementById('manager').value||'-';
   const d=new Date(); document.getElementById('pdfDate').innerText=`${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}`;
@@ -1325,15 +1307,37 @@ function openPdfPopup(){
   document.getElementById('pdfSignDate').innerText=document.getElementById('pdfDate').innerText;
   document.getElementById('pdfSigWrap').innerHTML=currentSignatureData?`<img src="${currentSignatureData}">`:'';
   
-  let html='',i=1;
-  rows.forEach(tr=>{
-    html+=`<tr><td>${i++}</td><td>${tr.dataset.g}</td><td style="text-align:left;padding-left:4px;">${tr.dataset.br}</td><td>${tr.dataset.code}</td><td>${tr.dataset.pn}</td><td style="text-align:left;padding-left:4px;">${tr.dataset.nm}</td><td>${tr.dataset.sp}</td><td style="text-align:right;padding-right:4px;">${formatNumber(tr.dataset.pr)}</td><td>${tr.querySelector('.f-qty').value}</td><td>${tr.querySelector('.f-rate').innerText}</td><td style="text-align:right;padding-right:4px;">${tr.querySelector('.f-supply').innerText}</td><td style="text-align:right;padding-right:4px;font-weight:bold;">${tr.querySelector('.f-amt').innerText}</td></tr>`;
+  let html='', i=1, prevBrand=null;
+  trs.forEach(tr => {
+    const curBrand = tr.dataset.br;
+    
+    // 이전 브랜드와 다를 경우, 위쪽에 진한 구분선(border) 적용
+    let rowStyle = (prevBrand !== null && prevBrand !== curBrand) ? 'border-top: 2px solid #333;' : '';
+    
+    html += `<tr style="${rowStyle}">
+        <td>${i++}</td>
+        <td>${tr.dataset.g}</td>
+        <td style="text-align:left;padding-left:4px;">${tr.dataset.br}</td>
+        <td>${tr.dataset.code}</td>
+        <td>${tr.dataset.pn}</td>
+        <td style="text-align:left;padding-left:4px;">${tr.dataset.nm}</td>
+        <td>${tr.dataset.sp}</td>
+        <td style="text-align:right;padding-right:4px;">${formatNumber(tr.dataset.pr)}</td>
+        <td>${tr.querySelector('.f-qty').value}</td>
+        <td>${tr.querySelector('.f-rate').innerText}</td>
+        <td style="text-align:right;padding-right:4px;">${tr.querySelector('.f-supply').innerText}</td>
+        <td style="text-align:right;padding-right:4px;font-weight:bold;">${tr.querySelector('.f-amt').innerText}</td>
+    </tr>`;
+    
+    prevBrand = curBrand;
   });
+  
   document.getElementById('pdfTableBody').innerHTML=html;
   document.getElementById('pdfSumQty').innerText=document.getElementById('sumQty').innerText;
   document.getElementById('pdfSumAmt').innerText=document.getElementById('sumAmt').innerText;
   document.getElementById('pdfDocumentOverlay').style.display='flex';
 }
+
 function savePdf(){
   const el=document.getElementById('pdfPrintArea'); const name=document.getElementById('pdfCustName').innerText;
   html2pdf().set({margin:8, filename:`특판가격_견적단가표_${name}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2.5,useCORS:true}, jsPDF:{unit:'mm',format:'a4',orientation:'landscape',compress:true}}).from(el).save();
