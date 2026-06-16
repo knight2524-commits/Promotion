@@ -84,14 +84,14 @@
         /* 구분별 라벨 디자인 */
         .badge-S { background:#1976D2; color:#fff; border-radius:10px; padding:1px 8px; font-size:11px; } 
         .badge-K { background:#00897b; color:#fff; border-radius:10px; padding:1px 8px; font-size:11px; } 
-        .badge-D { background:#8e24aa; color:#fff; border-radius:10px; padding:1px 8px; font-size:11px; } /* 지정용 */
+        .badge-D { background:#8e24aa; color:#fff; border-radius:10px; padding:1px 8px; font-size:11px; } 
         .badge-G { background:#9e9e9e; color:#fff; border-radius:10px; padding:1px 8px; font-size:11px; } 
         #dataTable tfoot td { background:#eceff1; font-weight:bold; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; }
         #itemDeleteConfirmModal { z-index: 2000; }
         .modal-content { background: white; padding: 25px; border-radius: 8px; width: 450px; display: flex; flex-direction: column; gap: 12px; position: relative; }
-        .modal-content input { font-size:14px; padding:8px 10px; border:1px solid #ccc; border-radius:5px; }
+        .modal-content input[type="text"], .modal-content input[type="password"] { font-size:14px; padding:8px 10px; border:1px solid #ccc; border-radius:5px; }
         .manage-list { display: none; max-height: 220px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 6px; margin-top: 5px; }
         .manage-list .mm-head { font-size: 12px; font-weight: bold; color: #666; padding: 8px 10px; background: #f4f4f4; position: sticky; top: 0; border-bottom: 1px solid #e0e0e0; }
         .manage-list .mm-empty { font-size: 12px; color: #aaa; padding: 12px 10px; text-align: center; }
@@ -99,16 +99,33 @@
         .manage-list .mm-row span { font-size: 13px; word-break: break-all; padding-right: 8px; }
         .manage-list .mm-del { background: #d32f2f; color: #fff; border: none; border-radius: 4px; width: 26px; height: 26px; min-width: 26px; cursor: pointer; font-weight: bold; font-size: 15px; }
 
+        /* PDF 출력 모달 및 테이블 레이아웃 최적화 */
         .pdf-modal-content { width: 840px; height: 95vh; overflow-y: auto; background: #fff; padding: 25px 38px; border-radius: 8px; box-shadow: 0 5px 25px rgba(0,0,0,0.3); position: relative; }
         .price-paper { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; color: #000; line-height: 1.45; padding: 8px; }
         .price-title { text-align: center; font-size: 22px; font-weight: bold; letter-spacing: 5px; margin-bottom: 16px; text-decoration: underline; text-underline-position: under; }
         .price-info { display:flex; justify-content:space-between; font-size: 12.5px; font-weight:bold; line-height:1.8; margin-bottom: 10px; border-left: 4px solid #2e7d32; padding-left: 12px; }
-        .price-table { width: 100%; border-collapse: collapse; margin: 6px 0; border: 1.5px solid #000; }
-        .price-table th, .price-table td { border: 1px solid #000 !important; padding: 4px 3px; text-align: center; font-size: 10.5px; }
+        
+        /* 테이블 열 너비 고정 및 텍스트 줄바꿈 방지 */
+        .price-table { width: 100%; border-collapse: collapse; margin: 6px 0; border: 1.5px solid #000; table-layout: fixed; }
+        .price-table th, .price-table td { 
+            border: 1px solid #000 !important; 
+            padding: 4px 2px; 
+            text-align: center; 
+            font-size: 10px; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            vertical-align: middle; 
+            height: 22px; 
+        }
         .price-table th { background-color: #f5f5f5; font-weight: bold; }
         .price-table tfoot td { background:#eceff1; font-weight:bold; }
+        
         .price-note { font-size: 10.5px; color:#333; margin-top:10px; line-height:1.6; }
         .price-supplier { margin-top: 14px; padding-top: 10px; border-top: 1px solid #000; font-size: 11px; line-height: 1.6; }
+
+        .promo-tab { padding: 8px 15px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap; }
+        .promo-tab.active { background: #f57c00; color: white; border-color: #e65100; }
 
         @media print {
             @page { margin: 0; size: A4 landscape; }
@@ -178,6 +195,7 @@
 
     <div class="panels">
         <div class="left-panel">
+            
             <div class="form-row">
                 <div class="input-group">
                     <label>거래처/대상</label>
@@ -225,14 +243,20 @@
                 <div class="input-group">
                     <label>글로벌 검색</label>
                     <div class="input-wrapper">
-                        <input type="text" id="quickSearch" autocomplete="off" placeholder="코드/품번/품명/규격/브랜드 (띄어쓰기 조합)" onfocus="quickSearchRun()" oninput="quickSearchRun()" onblur="setTimeout(()=>document.getElementById('quickResults').style.display='none',200)">
+                        <input type="text" id="quickSearch" autocomplete="off" placeholder="코드/품번/품명/규격/브랜드 검색" onfocus="quickSearchRun()" oninput="quickSearchRun()" onblur="setTimeout(()=>document.getElementById('quickResults').style.display='none',200)">
                         <div id="quickResults" class="quick-results"></div>
                     </div>
                 </div>
             </div>
 
             <div class="form-row">
-                <div style="flex: 1;"></div>
+                <div class="input-group">
+                    <label>프로모션현황</label>
+                    <div class="input-wrapper">
+                        <button class="btn-sig-open" style="background:#f57c00;" onclick="openPromoModal()">📢 프로모션 확인하기</button>
+                        <button class="btn-plus" onclick="openPromoManageModal()">+</button>
+                    </div>
+                </div>
                 <div class="input-group">
                     <label>수량</label>
                     <div class="input-wrapper" style="gap:2px;">
@@ -314,6 +338,7 @@
         </label>
         <button class="btn-login" style="background:#d32f2f; flex:1;" onclick="openDeleteModal()">선택삭제</button>
         <button class="btn-login" style="background:#1976D2; flex:1;" onclick="openPdfPopup()">견적/단가표 출력</button>
+        <button class="btn-login" id="btn-all-pdf" style="background:#0288d1; flex:1; display:none;" onclick="openAllProductsPdfPopup()">전체 마스터 PDF 출력</button>
         <button class="btn-login" style="background:#FF9800; flex:1;" onclick="saveAsJson()">양식저장</button>
         <label class="btn-login" style="flex:1; text-align:center; background:#455A64; line-height:30px;">양식불러오기<input type="file" id="loadJson" style="display:none;" onchange="loadFromJson(event)"></label>
         <label class="btn-login btn-plus" id="btn-reload" style="flex:1; text-align:center; background:#6a1b9a; line-height:30px;">상품마스터(엑셀)<input type="file" id="reloadXlsx" accept=".xlsx,.xls,.csv" style="display:none;" onchange="reloadMaster(event)"></label>
@@ -353,6 +378,35 @@
     </div>
 </div>
 
+<div id="promoModal" class="modal-overlay">
+    <div class="modal-content" style="width: 800px; height: 85vh; padding: 20px; max-width: 95vw;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; color: #f57c00;">📢 프로모션 현황 확인</h3>
+            <button onclick="closeModal('promoModal')" style="padding: 6px 20px; background:#757575; color:white; border:none; border-radius:5px; cursor:pointer;">닫기</button>
+        </div>
+        <div id="promoTabs" style="margin-top: 15px; display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px;"></div>
+        <div style="flex: 1; margin-top: 10px; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; background: #fafafa; display:flex; justify-content:center; align-items:center;">
+            <iframe id="promoViewer" style="width:100%; height:100%; border:none; display:none;"></iframe>
+            <img id="promoImgViewer" style="max-width:100%; max-height:100%; object-fit:contain; display:none;">
+            <span id="promoEmptyMsg" style="color:#888;">등록된 프로모션이 없거나 선택되지 않았습니다.</span>
+        </div>
+    </div>
+</div>
+
+<div id="promoManageModal" class="modal-overlay">
+    <div class="modal-content" style="width: 500px;">
+        <h3 style="margin-top:0; color:#f57c00;">📢 프로모션 파일 관리</h3>
+        <div style="display:flex; gap:10px; margin-bottom: 10px;">
+            <input type="file" id="promoUploader" accept="image/*,application/pdf" style="flex:1; border:1px solid #ccc; padding:8px; border-radius:4px;" onchange="uploadPromo(event)">
+        </div>
+        <p style="font-size:11px; color:#d32f2f; margin-top:-5px;">※ 용량이 너무 큰 PDF/이미지는 앱 양식 저장 시 오래 걸릴 수 있습니다. (권장: 2MB 이하)</p>
+        <div id="promoListArea" class="manage-list" style="display:block; max-height:250px;"></div>
+        <div style="text-align: right; margin-top: 15px;">
+            <button onclick="closeModal('promoManageModal')" style="padding:8px 20px; background:#757575; color:white; border:none; border-radius:5px; cursor:pointer;">닫기</button>
+        </div>
+    </div>
+</div>
+
 <div id="userManageModal" class="modal-overlay">
     <div class="modal-content" style="width: 400px;">
         <h3 style="margin-top:0; color:#E64A19;">👥 사용자(로그인) 관리</h3>
@@ -372,13 +426,26 @@
 <div id="pdfDocumentOverlay" class="modal-overlay">
     <div class="pdf-modal-content">
         <div id="pdfPrintArea" class="price-paper">
-            <div class="price-title">작 업 수 입 견 적 · 단 가 표</div>
+            <div class="price-title">특 판 견 적 · 단 가 표</div>
             <div class="price-info">
                 <div>거래처/대상: <span id="pdfCustName"></span><br>작성담당: <span id="pdfManager"></span></div>
                 <div style="text-align:right;">작성일: <span id="pdfDate"></span><br>연동가산: 국산(지정) +<span id="pdfRate"></span>%p (기준 <span id="pdfNB"></span>종 연동)</div>
             </div>
             <table class="price-table">
-                <thead><tr><th style="width:26px;">No</th><th style="width:40px;">구분</th><th style="width:82px;">브랜드</th><th style="width:58px;">발주코드</th><th style="width:62px;">품번</th><th>상품명</th><th style="width:88px;">규격</th><th style="width:66px;">특약점가</th><th style="width:40px;">수량</th><th style="width:38px;">할인</th><th style="width:66px;">공급단가</th><th style="width:74px;">금액</th></tr></thead>
+                <thead><tr>
+                    <th style="width:24px;">No</th>
+                    <th style="width:36px;">구분</th>
+                    <th style="width:85px;">브랜드</th>
+                    <th style="width:65px;">발주코드</th>
+                    <th style="width:75px;">품번</th>
+                    <th>상품명</th>
+                    <th style="width:100px;">규격</th>
+                    <th style="width:60px;">특약점가</th>
+                    <th style="width:32px;">수량</th>
+                    <th style="width:38px;">할인</th>
+                    <th style="width:60px;">공급단가</th>
+                    <th style="width:70px;">금액</th>
+                </tr></thead>
                 <tbody id="pdfTableBody"></tbody>
                 <tfoot><tr><td colspan="8">합 계</td><td id="pdfSumQty"></td><td>-</td><td>-</td><td id="pdfSumAmt"></td></tr></tfoot>
             </table>
@@ -452,9 +519,10 @@ let currentSignatureData = '';
 let pendingDelete = { target:null, index:null };
 let sortState = { col:null, dir:1 };
 
-// 앱 접속자 계정, 거래처DB
+// 앱 접속자 계정, 거래처DB, 프로모션 현황 파일
 let appUsers = { "admin": "hq1234" };
 let customerDB = [];
+let promoFiles = []; 
 
 function settingsEndpoint(){ return (SETTINGS_URL || 'settings.json') + '?_=' + Date.now(); }
 
@@ -464,21 +532,35 @@ function collectSettings(){
     brandBase: {...brandBase},
     engineOn: document.getElementById('engineToggle').checked,
     users: appUsers,
+    promoFiles: promoFiles,
     updatedAt: Date.now(),
     by: '석정주 과장'
   };
 }
+
 function applySettings(s){
   if(!s) return;
   if(s.cfg){ const c=s.cfg; if(c.mode) document.getElementById('cfgMode').value=c.mode; if(c.unit!==undefined) document.getElementById('cfgUnit').value=c.unit; if(c.step!==undefined) document.getElementById('cfgStep').value=c.step; if(c.cap!==undefined) document.getElementById('cfgCap').value=c.cap; toggleModeParams(); }
   if(s.brandBase){ brandBase={...brandBase, ...s.brandBase}; }
   if(s.engineOn !== undefined) { document.getElementById('engineToggle').checked = s.engineOn; }
   if(s.users) { appUsers = s.users; }
+  if(s.promoFiles) { promoFiles = s.promoFiles; }
+  
   updateAuthUI();
   recalcAll();
   if(s.updatedAt){ try{ document.getElementById('policyStatus').innerText=`정책 적용: ${new Date(s.updatedAt).toLocaleString('ko-KR')} (${s.by||'-'})`; }catch(e){} }
 }
-function saveLocal(s){ try{ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }catch(e){} }
+
+function saveLocal(s){ 
+    try{ 
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); 
+    }catch(e){
+        if(e.name === 'QuotaExceededError') {
+            alert('저장 용량을 초과했습니다! 용량이 큰 이미지는 삭제해주세요.');
+        }
+    } 
+}
+
 function loadLocal(){ try{ const v=localStorage.getItem(SETTINGS_KEY); return v?JSON.parse(v):null; }catch(e){ return null; } }
 
 function loadSettings(silent){
@@ -499,7 +581,7 @@ function publishSettings(){
 function restoreDefaults(){
   if(!confirm('내장 기본값으로 되돌릴까요? (이 기기 저장분 삭제)')) return;
   try{ localStorage.removeItem(SETTINGS_KEY); }catch(e){}
-  applySettings({ cfg:{mode:'amount',unit:'100,000',step:'1',cap:'8'}, brandBase:{...DEFAULT_BRANDBASE}, engineOn: true, users: {"admin":"hq1234"} });
+  applySettings({ cfg:{mode:'amount',unit:'100,000',step:'1',cap:'8'}, brandBase:{...DEFAULT_BRANDBASE}, engineOn: true, users: {"admin":"hq1234"}, promoFiles: [] });
   document.getElementById('policyStatus').innerText='정책 적용: 기본값';
 }
 
@@ -523,6 +605,101 @@ window.onload = function(){
     updateAuthUI(); 
     recalcAll(); 
 };
+
+/* --- 프로모션 뷰어 및 관리 로직 --- */
+function openPromoModal() {
+    if(!promoFiles || promoFiles.length === 0) {
+        return alert('등록된 프로모션 자료가 없습니다.');
+    }
+    
+    const tabsContainer = document.getElementById('promoTabs');
+    tabsContainer.innerHTML = promoFiles.map((f, i) => 
+        `<button class="promo-tab" onclick="viewPromo(${i}, this)">${f.name}</button>`
+    ).join('');
+    
+    document.getElementById('promoModal').style.display = 'flex';
+    
+    const firstTab = tabsContainer.querySelector('button');
+    if(firstTab) firstTab.click();
+}
+
+function viewPromo(index, btnEl) {
+    document.querySelectorAll('.promo-tab').forEach(b => b.classList.remove('active'));
+    if(btnEl) btnEl.classList.add('active');
+
+    const file = promoFiles[index];
+    const iframe = document.getElementById('promoViewer');
+    const img = document.getElementById('promoImgViewer');
+    const emptyMsg = document.getElementById('promoEmptyMsg');
+
+    iframe.style.display = 'none';
+    img.style.display = 'none';
+    emptyMsg.style.display = 'none';
+
+    if(!file) {
+        emptyMsg.style.display = 'inline';
+        return;
+    }
+
+    if(file.type.includes('image')) {
+        img.src = file.data;
+        img.style.display = 'block';
+    } else {
+        iframe.src = file.data;
+        iframe.style.display = 'block';
+    }
+}
+
+function openPromoManageModal() {
+    renderPromoManageList();
+    document.getElementById('promoManageModal').style.display = 'flex';
+}
+
+function uploadPromo(event) {
+    const file = event.target.files[0];
+    if(!file) return;
+
+    if(file.size > 5 * 1024 * 1024) {
+        alert('파일 크기가 너무 큽니다. (권장: 2MB 이하)\n데이터 저장 용량 초과 시 저장이 안 될 수 있습니다.');
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        promoFiles.push({
+            name: file.name,
+            type: file.type,
+            data: e.target.result
+        });
+        renderPromoManageList();
+        saveLocal(collectSettings());
+    };
+    reader.readAsDataURL(file);
+    event.target.value = '';
+}
+
+function deletePromo(index) {
+    if(!confirm('이 프로모션 파일을 삭제하시겠습니까?')) return;
+    promoFiles.splice(index, 1);
+    renderPromoManageList();
+    saveLocal(collectSettings());
+}
+
+function renderPromoManageList() {
+    const area = document.getElementById('promoListArea');
+    if(!promoFiles || promoFiles.length === 0) {
+        area.innerHTML = '<div class="mm-empty">등록된 프로모션이 없습니다.</div>';
+        return;
+    }
+
+    let html = '<div class="mm-head">업로드된 프로모션 목록</div>';
+    promoFiles.forEach((f, i) => {
+        html += `<div class="mm-row">
+            <span style="flex:1; overflow:hidden; text-overflow:ellipsis;">${f.name}</span>
+            <button class="mm-del" onclick="deletePromo(${i})">×</button>
+        </div>`;
+    });
+    area.innerHTML = html;
+}
 
 /* --- 시스템 초기 접속 로그인 --- */
 function attemptAppLogin() {
@@ -727,7 +904,10 @@ function updateAuthUI(){
   const dbBtn = document.getElementById('dbUploadBtn');
   if(dbBtn) dbBtn.style.display = isLoggedIn ? 'block' : 'none';
 
-  // 엔진 제어 UI
+  // 전체 마스터 PDF 출력 버튼 노출 제어
+  const allPdfBtn = document.getElementById('btn-all-pdf');
+  if(allPdfBtn) allPdfBtn.style.display = isLoggedIn ? 'block' : 'none';
+
   const dynPanel = document.getElementById('enginePanel');
   const cfgMode = document.getElementById('cfgMode');
   const engineToggle = document.getElementById('engineToggle');
@@ -741,12 +921,12 @@ function updateAuthUI(){
       cfgMode.disabled = false;
       engineToggle.disabled = false;
   } else {
-      cfgMode.disabled = true; // 옵션 조작 잠금
-      engineToggle.disabled = true; // On/Off 조작 잠금
+      cfgMode.disabled = true; 
+      engineToggle.disabled = true; 
       if (!engineToggle.checked) {
-          dynPanel.style.display = 'none'; // 꺼져있으면 패널 전체 숨김
+          dynPanel.style.display = 'none'; 
       } else {
-          dynPanel.style.display = 'block'; // 켜져있으면 표시는 하되 조작만 불가
+          dynPanel.style.display = 'block'; 
       }
   }
 
@@ -758,7 +938,6 @@ function updateAllSelects(){
   selManager.innerHTML=`<option value="">담당자 선택</option>`+(masterData.manager||[]).map(v=>`<option value="${v}">${v}</option>`).join('');
 }
 function buildBrandSelect(){
-  // '지정' 상품은 일반 수입/국산 브랜드 선택지에 나오지 않도록 엄격하게 필터링
   const brandsA=[...new Set(PRODUCTS.filter(p=>p.g.includes('수입') && !p.g.includes('지정')).map(p=>p.br))].sort();
   const brandsB=[...new Set(PRODUCTS.filter(p=>p.g.includes('국산') && !p.g.includes('지정')).map(p=>p.br))].sort();
   const brandsE=[...new Set(PRODUCTS.filter(p=>!p.g.includes('수입') && !p.g.includes('국산') && !p.g.includes('지정')).map(p=>p.br))].sort();
@@ -770,7 +949,6 @@ function buildBrandSelect(){
   if(brandsE.length) bHtml+=`<optgroup label="── 기타 ──">`+brandsE.map(b=>`<option value="기타|${b}">${b}</option>`).join('')+`</optgroup>`;
   document.getElementById('brandB').innerHTML=bHtml;
 
-  // [지정] 전용 드롭다운 목록 생성 -> 텍스트 커스터마이징
   const desigProducts = PRODUCTS.filter(p => p.g.includes('지정')).sort((a,b)=>a.nm.localeCompare(b.nm));
   const desigSelect = document.getElementById('desigSelect');
   if(desigSelect) {
@@ -793,7 +971,6 @@ function fillCodes(value) {
     document.getElementById('qty').value = '1';
     document.getElementById('qty').dataset.baseQty = '1';
     
-    // 일반 조작 시 지정 선택창 강제 초기화
     const desigSel = document.getElementById('desigSelect');
     if(desigSel) desigSel.value = '';
     document.getElementById('desigQty').value = '1';
@@ -810,7 +987,6 @@ function fillCodes(value) {
 function onDesigChange() {
     const code = document.getElementById('desigSelect').value;
     if(code) {
-        // 일반 브랜드 및 코드 선택창 강제 초기화
         document.getElementById('brandA').value = '';
         document.getElementById('brandB').value = '';
         document.getElementById('codeSelect').value = '';
@@ -820,7 +996,7 @@ function onDesigChange() {
         
         const p = PRODUCTS.find(x => x.c === code);
         if(p) {
-            document.getElementById('desigQty').value = p.baseQty || 1; // R열 배수기준
+            document.getElementById('desigQty').value = p.baseQty || 1; 
             document.getElementById('desigQty').dataset.baseQty = p.baseQty || 1;
         }
     } else {
@@ -829,7 +1005,6 @@ function onDesigChange() {
     }
 }
 
-// 안전한 배수 산출 로직
 function snapToMultiple(val, base) {
     if(isNaN(val) || isNaN(base) || base <= 0) return 1;
     if(val < base) return base;
@@ -880,7 +1055,6 @@ function codeSearchRun() {
   }
   
   const [g, br] = activeBrand.split('|');
-  // 브랜드 하위에서는 '지정' 상품 노출 방지
   const hits = PRODUCTS.filter(p => p.g === g && p.br === br && !p.g.includes('지정') && matchProduct(p, q)).slice(0,30);
   
   if(!hits.length){ box.innerHTML='<div class="qr" style="color:#aaa;cursor:default;">결과 없음</div>'; box.style.display='block'; return; }
@@ -919,7 +1093,6 @@ function quickSearchRun(){
 function pickProduct(code){
   const p=PRODUCTS.find(x=>x.c===code); if(!p) return;
   
-  // 지정상품인 경우 처리
   if(p.g.includes('지정')) {
       document.getElementById('brandA').value = '';
       document.getElementById('brandB').value = '';
@@ -934,7 +1107,6 @@ function pickProduct(code){
       return;
   }
   
-  // 일반상품인 경우 처리
   if(p.g.includes('수입')){ document.getElementById('brandA').value='수입|'+p.br; document.getElementById('brandB').value=''; fillCodes('수입|'+p.br); }
   else { document.getElementById('brandB').value='국산|'+p.br; document.getElementById('brandA').value=''; fillCodes('국산|'+p.br); }
 
@@ -958,10 +1130,7 @@ function tableStats(){
     const a = price * qty;
     total += a;
     
-    // 수입 금액
     if(tr.dataset.g.includes('수입')){ importAmt += a; importCnt++; }
-    
-    // 지정 상품 금액 (구분(g)에 '지정' 포함 시)
     if(tr.dataset.g.includes('지정')){ desigAmt += a; desigCnt++; }
   });
   return {total, importAmt, importCnt, desigAmt, desigCnt};
@@ -976,7 +1145,7 @@ function incPct(s){
   if(mode==='amount') {
       units = Math.floor(s.importAmt / unit);
   } else if(mode==='desig') { 
-      units = Math.floor(s.desigAmt / unit); // 지정상품 금액구간 적용 (산식 동일하게)
+      units = Math.floor(s.desigAmt / unit); 
   }
   
   return units*step;
@@ -1035,7 +1204,6 @@ function addRecordRow(){
   let code = document.getElementById('codeSelect').value;
   let qtyInput = document.getElementById('qty');
   
-  // 지정 상품인 경우 메인 수량 대신 지정 수량 입력값을 취함
   if(!code) {
       code = document.getElementById('desigSelect').value;
       qtyInput = document.getElementById('desigQty');
@@ -1059,7 +1227,6 @@ function addRecordRow(){
   
   recalcAll(); applySearch();
   
-  // 추가 후 수량만 리셋
   if(!isDesig) {
       qtyInput.value = p.baseQty || 1;
   }
@@ -1093,7 +1260,6 @@ function insertRow(r){
   const bQty = r.baseQty || 1;
   const isDesig = r.g.includes('지정');
 
-  // 지정상품은 수량을 고정(수정불가)되도록 처리
   const qtyCell = isDesig 
       ? `<input type="text" class="f-qty" value="${r.qty}" style="width:40px; text-align:center; background:transparent; border:none; font-weight:bold; color:#8e24aa;" readonly>`
       : `<div style="display:flex; justify-content:center; gap:2px; align-items:center;">
@@ -1240,10 +1406,8 @@ function reloadMaster(e){
       const br = String(o[colBr]).trim();
       const pr = parseInt(String(o[colPr]).replace(/[^0-9.-]/g,'')) || 0; 
       
-      // H열 데이터를 우선 파싱
       const rawH = String(o[colH] !== undefined ? o[colH] : '').trim(); 
       
-      // 빈 값이거나 0, NaN 등의 잘못된 값일 때 무조건 1로 강제보정하는 안전장치 적용
       const rawR = String(o[17] !== undefined ? o[17] : '').replace(/[^0-9.-]/g, '');
       let baseQty = parseInt(rawR);
       if(isNaN(baseQty) || baseQty <= 0) baseQty = 1;
@@ -1251,7 +1415,6 @@ function reloadMaster(e){
       const rawS = String(o[18] !== undefined ? o[18] : '').replace(/[^0-9.-]/g, '');
       const baseSupply = rawS === '' ? pr : parseInt(rawS); 
       
-      // 구분 설정 (빈 값이면 기본 브랜드 분류 따름, H열에 지정이 포함되어있으면 지정 우선)
       let g = '기타';
       if(colGubun !== -1) {
           const gv = String(o[colGubun]).trim();
@@ -1281,12 +1444,11 @@ function reloadMaster(e){
   e.target.value='';
 }
 
-/* PDF 출력 및 브랜드별 자동 정렬 로직 */
+/* 현재 화면 견적/단가표 PDF 출력 */
 function openPdfPopup(){
   const trs = Array.from(document.querySelectorAll('#tableBody tr')); 
   if(!trs.length) return alert('기록된 행이 없습니다.');
 
-  // 브랜드명 기준으로 사전순 정렬
   trs.sort((a, b) => {
       const brA = a.dataset.br || '';
       const brB = b.dataset.br || '';
@@ -1310,8 +1472,6 @@ function openPdfPopup(){
   let html='', i=1, prevBrand=null;
   trs.forEach(tr => {
     const curBrand = tr.dataset.br;
-    
-    // 이전 브랜드와 다를 경우, 위쪽에 진한 구분선(border) 적용
     let rowStyle = (prevBrand !== null && prevBrand !== curBrand) ? 'border-top: 2px solid #333;' : '';
     
     html += `<tr style="${rowStyle}">
@@ -1328,13 +1488,78 @@ function openPdfPopup(){
         <td style="text-align:right;padding-right:4px;">${tr.querySelector('.f-supply').innerText}</td>
         <td style="text-align:right;padding-right:4px;font-weight:bold;">${tr.querySelector('.f-amt').innerText}</td>
     </tr>`;
-    
     prevBrand = curBrand;
   });
   
   document.getElementById('pdfTableBody').innerHTML=html;
   document.getElementById('pdfSumQty').innerText=document.getElementById('sumQty').innerText;
   document.getElementById('pdfSumAmt').innerText=document.getElementById('sumAmt').innerText;
+  document.getElementById('pdfDocumentOverlay').style.display='flex';
+}
+
+/* 전체 상품 마스터 PDF 출력 (관리자 전용) */
+function openAllProductsPdfPopup(){
+  if(!PRODUCTS || !PRODUCTS.length) return alert('상품마스터에 데이터가 없습니다.');
+
+  // 브랜드명 기준으로 사전순 정렬
+  const sortedProducts = [...PRODUCTS].sort((a, b) => {
+      const brA = a.br || '';
+      const brB = b.br || '';
+      return brA.localeCompare(brB, 'ko');
+  });
+
+  document.getElementById('pdfCustName').innerText = document.getElementById('customer').value || '전체 마스터';
+  document.getElementById('pdfManager').innerText = document.getElementById('manager').value || '-';
+  const d = new Date(); document.getElementById('pdfDate').innerText = `${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()}`;
+  document.getElementById('pdfNotes').innerText = document.getElementById('notes').value || '전체 상품 카탈로그 및 단가표';
+  
+  const engineOn = document.getElementById('engineToggle').checked;
+  const inc = engineOn ? Math.round(incPct(tableStats())*100)/100 : 0;
+  
+  document.getElementById('pdfRate').innerText = inc; 
+  document.getElementById('pdfNB').innerText = tableStats().importCnt;
+  document.getElementById('pdfSignCust').innerText = document.getElementById('customer').value || '-';
+  document.getElementById('pdfSignDate').innerText = document.getElementById('pdfDate').innerText;
+  document.getElementById('pdfSigWrap').innerHTML = currentSignatureData ? `<img src="${currentSignatureData}">` : '';
+  
+  let html='', i=1, prevBrand=null;
+  let sumQty=0, sumAmt=0;
+  
+  sortedProducts.forEach(p => {
+    const curBrand = p.br;
+    let rowStyle = (prevBrand !== null && prevBrand !== curBrand) ? 'border-top: 2px solid #333;' : '';
+    
+    const qty = p.baseQty || 1;
+    const s_val = p.baseSupply !== undefined ? p.baseSupply : p.pr;
+    
+    const rate = rateFor(p.g, p.br, inc);
+    const supply = Math.round(s_val * (1 - rate/100)); 
+    const amt = supply * qty;
+    
+    sumQty += qty;
+    sumAmt += amt;
+    
+    html += `<tr style="${rowStyle}">
+        <td>${i++}</td>
+        <td>${p.g}</td>
+        <td style="text-align:left;padding-left:4px;">${p.br}</td>
+        <td>${p.c}</td>
+        <td>${p.pn||''}</td>
+        <td style="text-align:left;padding-left:4px;">${p.nm||''}</td>
+        <td>${p.sp||''}</td>
+        <td style="text-align:right;padding-right:4px;">${formatNumber(p.pr)}</td>
+        <td>${qty}</td>
+        <td>${(Math.round(rate*100)/100)}%</td>
+        <td style="text-align:right;padding-right:4px;">${formatNumber(supply)}</td>
+        <td style="text-align:right;padding-right:4px;font-weight:bold;">${formatNumber(amt)}</td>
+    </tr>`;
+    
+    prevBrand = curBrand;
+  });
+  
+  document.getElementById('pdfTableBody').innerHTML=html;
+  document.getElementById('pdfSumQty').innerText=sumQty;
+  document.getElementById('pdfSumAmt').innerText=formatNumber(sumAmt);
   document.getElementById('pdfDocumentOverlay').style.display='flex';
 }
 
@@ -1353,7 +1578,7 @@ function saveAsJson(){
       qty:tr.querySelector('.f-qty').value
   }));
   const cfgv={mode:document.getElementById('cfgMode').value,unit:document.getElementById('cfgUnit').value,step:document.getElementById('cfgStep').value,cap:document.getElementById('cfgCap').value};
-  const data={master:masterData, rows, cfg:cfgv, brandBase, engineOn: document.getElementById('engineToggle').checked, users: appUsers, sig:currentSignatureData, header:{customer:document.getElementById('customer').value,manager:document.getElementById('manager').value,notes:document.getElementById('notes').value}};
+  const data={master:masterData, rows, cfg:cfgv, brandBase, engineOn: document.getElementById('engineToggle').checked, users: appUsers, promoFiles: promoFiles, sig:currentSignatureData, header:{customer:document.getElementById('customer').value,manager:document.getElementById('manager').value,notes:document.getElementById('notes').value}};
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'})); a.download='특판가격_관리.json'; a.click();
 }
 function loadFromJson(e){
@@ -1363,6 +1588,7 @@ function loadFromJson(e){
     if(p.master) masterData=p.master; updateAllSelects();
     if(p.brandBase) brandBase=p.brandBase;
     if(p.users) appUsers=p.users;
+    if(p.promoFiles) promoFiles=p.promoFiles;
     if(p.cfg){ if(p.cfg.mode) document.getElementById('cfgMode').value=p.cfg.mode; if(p.cfg.unit!==undefined) document.getElementById('cfgUnit').value=p.cfg.unit; if(p.cfg.step!==undefined) document.getElementById('cfgStep').value=p.cfg.step; if(p.cfg.cap!==undefined) document.getElementById('cfgCap').value=p.cfg.cap; toggleModeParams(); }
     if(p.engineOn !== undefined) { document.getElementById('engineToggle').checked = p.engineOn; }
     if(p.header){ document.getElementById('customer').value=p.header.customer||''; document.getElementById('manager').value=p.header.manager||''; document.getElementById('notes').value=p.header.notes||''; }
