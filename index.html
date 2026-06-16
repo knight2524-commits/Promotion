@@ -224,6 +224,15 @@
                     </div>
                 </div>
                 <div class="input-group">
+                    <label>브랜드(국산)</label>
+                    <div class="input-wrapper">
+                        <select id="brandB" onchange="onBrandPick('B')"><option value="">국산 브랜드 선택</option></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="input-group">
                     <label>발주코드</label>
                     <div class="input-wrapper">
                         <input type="text" id="codeSearch" autocomplete="off" placeholder="브랜드 먼저 선택" onfocus="codeSearchRun()" oninput="codeSearchRun()" onblur="setTimeout(()=>document.getElementById('codeResults').style.display='none',200)" style="cursor:text; background:#fff;">
@@ -231,19 +240,10 @@
                         <div id="codeResults" class="quick-results"></div>
                     </div>
                 </div>
-            </div>
-
-            <div class="form-row">
-                <div class="input-group">
-                    <label>브랜드(국산)</label>
-                    <div class="input-wrapper">
-                        <select id="brandB" onchange="onBrandPick('B')"><option value="">국산 브랜드 선택</option></select>
-                    </div>
-                </div>
                 <div class="input-group">
                     <label>글로벌 검색</label>
                     <div class="input-wrapper">
-                        <input type="text" id="quickSearch" autocomplete="off" placeholder="코드/품번/품명/규격/브랜드 검색" onfocus="quickSearchRun()" oninput="quickSearchRun()" onblur="setTimeout(()=>document.getElementById('quickResults').style.display='none',200)">
+                        <input type="text" id="quickSearch" autocomplete="off" placeholder="코드/품번/품명/규격/브랜드 (띄어쓰기 조합)" onfocus="quickSearchRun()" oninput="quickSearchRun()" onblur="setTimeout(()=>document.getElementById('quickResults').style.display='none',200)">
                         <div id="quickResults" class="quick-results"></div>
                     </div>
                 </div>
@@ -438,8 +438,7 @@
                     <th style="width:85px;">브랜드</th>
                     <th style="width:65px;">발주코드</th>
                     <th style="width:75px;">품번</th>
-                    <th>상품명</th>
-                    <th style="width:100px;">규격</th>
+                    <th>상품명</th> <th style="width:100px;">규격</th>
                     <th style="width:60px;">특약점가</th>
                     <th style="width:32px;">수량</th>
                     <th style="width:38px;">할인</th>
@@ -533,6 +532,8 @@ function collectSettings(){
     engineOn: document.getElementById('engineToggle').checked,
     users: appUsers,
     promoFiles: promoFiles,
+    products: PRODUCTS,
+    masterData: masterData,
     updatedAt: Date.now(),
     by: '석정주 과장'
   };
@@ -546,8 +547,25 @@ function applySettings(s){
   if(s.users) { appUsers = s.users; }
   if(s.promoFiles) { promoFiles = s.promoFiles; }
   
+  let uiNeedsUpdate = false;
+  if(s.products && Array.isArray(s.products)) {
+      PRODUCTS = s.products;
+      uiNeedsUpdate = true;
+  }
+  if(s.masterData) {
+      masterData = s.masterData;
+      updateAllSelects();
+  }
+  
   updateAuthUI();
   recalcAll();
+  
+  if(uiNeedsUpdate) {
+      initBrandBase();
+      buildBrandSelect();
+      fillCodes('');
+  }
+  
   if(s.updatedAt){ try{ document.getElementById('policyStatus').innerText=`정책 적용: ${new Date(s.updatedAt).toLocaleString('ko-KR')} (${s.by||'-'})`; }catch(e){} }
 }
 
@@ -575,7 +593,7 @@ function refreshSettings(){ loadSettings(false); }
 function publishSettings(){
   if(!isLoggedIn) return alert('관리자만 내보낼 수 있습니다.');
   const s=collectSettings(); saveLocal(s); applySettings(s);
-  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(s,null,2)],{type:'application/json'})); a.download='특판가격_관리.json'; a.click();
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(s,null,2)],{type:'application/json'})); a.download='settings.json'; a.click();
   alert('settings.json 을 받았습니다.\n이 파일을 호스팅(앱과 같은 폴더)에 올리면, 현장 앱이 다음 실행 때 자동 반영됩니다.');
 }
 function restoreDefaults(){
