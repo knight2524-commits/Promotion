@@ -224,20 +224,20 @@
                     </div>
                 </div>
                 <div class="input-group">
-                    <label>브랜드(국산)</label>
+                    <label>발주코드</label>
                     <div class="input-wrapper">
-                        <select id="brandB" onchange="onBrandPick('B')"><option value="">국산 브랜드 선택</option></select>
+                        <input type="text" id="codeSearch" autocomplete="off" placeholder="브랜드 먼저 선택" onfocus="codeSearchRun()" oninput="codeSearchRun()" onblur="setTimeout(()=>document.getElementById('codeResults').style.display='none',200)" style="cursor:text; background:#fff;">
+                        <input type="hidden" id="codeSelect">
+                        <div id="codeResults" class="quick-results"></div>
                     </div>
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="input-group">
-                    <label>발주코드</label>
+                    <label>브랜드(국산)</label>
                     <div class="input-wrapper">
-                        <input type="text" id="codeSearch" autocomplete="off" placeholder="브랜드 먼저 선택" onfocus="codeSearchRun()" oninput="codeSearchRun()" onblur="setTimeout(()=>document.getElementById('codeResults').style.display='none',200)" style="cursor:text; background:#fff;">
-                        <input type="hidden" id="codeSelect">
-                        <div id="codeResults" class="quick-results"></div>
+                        <select id="brandB" onchange="onBrandPick('B')"><option value="">국산 브랜드 선택</option></select>
                     </div>
                 </div>
                 <div class="input-group">
@@ -533,6 +533,7 @@ function collectSettings(){
     users: appUsers,
     promoFiles: promoFiles,
     products: PRODUCTS,
+    customerDB: customerDB,
     masterData: masterData,
     updatedAt: Date.now(),
     by: '석정주 과장'
@@ -546,6 +547,7 @@ function applySettings(s){
   if(s.engineOn !== undefined) { document.getElementById('engineToggle').checked = s.engineOn; }
   if(s.users) { appUsers = s.users; }
   if(s.promoFiles) { promoFiles = s.promoFiles; }
+  if(s.customerDB) { customerDB = s.customerDB; localStorage.setItem('kb1_customer_db', JSON.stringify(customerDB)); }
   
   let uiNeedsUpdate = false;
   if(s.products && Array.isArray(s.products)) {
@@ -598,8 +600,9 @@ function publishSettings(){
 }
 function restoreDefaults(){
   if(!confirm('내장 기본값으로 되돌릴까요? (이 기기 저장분 삭제)')) return;
-  try{ localStorage.removeItem(SETTINGS_KEY); }catch(e){}
-  applySettings({ cfg:{mode:'amount',unit:'100,000',step:'1',cap:'8'}, brandBase:{...DEFAULT_BRANDBASE}, engineOn: true, users: {"admin":"hq1234"}, promoFiles: [] });
+  try{ localStorage.removeItem(SETTINGS_KEY); localStorage.removeItem('kb1_customer_db'); }catch(e){}
+  customerDB = [];
+  applySettings({ cfg:{mode:'amount',unit:'100,000',step:'1',cap:'8'}, brandBase:{...DEFAULT_BRANDBASE}, engineOn: true, users: {"admin":"hq1234"}, promoFiles: [], products: convertOriginalProducts(ORIGINAL_PRODUCTS), customerDB: [] });
   document.getElementById('policyStatus').innerText='정책 적용: 기본값';
 }
 
@@ -1596,7 +1599,7 @@ function saveAsJson(){
       qty:tr.querySelector('.f-qty').value
   }));
   const cfgv={mode:document.getElementById('cfgMode').value,unit:document.getElementById('cfgUnit').value,step:document.getElementById('cfgStep').value,cap:document.getElementById('cfgCap').value};
-  const data={master:masterData, rows, cfg:cfgv, brandBase, engineOn: document.getElementById('engineToggle').checked, users: appUsers, promoFiles: promoFiles, sig:currentSignatureData, header:{customer:document.getElementById('customer').value,manager:document.getElementById('manager').value,notes:document.getElementById('notes').value}};
+  const data={master:masterData, rows, cfg:cfgv, brandBase, engineOn: document.getElementById('engineToggle').checked, users: appUsers, promoFiles: promoFiles, products: PRODUCTS, customerDB: customerDB, sig:currentSignatureData, header:{customer:document.getElementById('customer').value,manager:document.getElementById('manager').value,notes:document.getElementById('notes').value}};
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(data)],{type:'application/json'})); a.download='특판가격_관리.json'; a.click();
 }
 function loadFromJson(e){
@@ -1607,6 +1610,8 @@ function loadFromJson(e){
     if(p.brandBase) brandBase=p.brandBase;
     if(p.users) appUsers=p.users;
     if(p.promoFiles) promoFiles=p.promoFiles;
+    if(p.customerDB) { customerDB = p.customerDB; localStorage.setItem('kb1_customer_db', JSON.stringify(customerDB)); }
+    if(p.products && Array.isArray(p.products)) { PRODUCTS = p.products; initBrandBase(); buildBrandSelect(); fillCodes(''); }
     if(p.cfg){ if(p.cfg.mode) document.getElementById('cfgMode').value=p.cfg.mode; if(p.cfg.unit!==undefined) document.getElementById('cfgUnit').value=p.cfg.unit; if(p.cfg.step!==undefined) document.getElementById('cfgStep').value=p.cfg.step; if(p.cfg.cap!==undefined) document.getElementById('cfgCap').value=p.cfg.cap; toggleModeParams(); }
     if(p.engineOn !== undefined) { document.getElementById('engineToggle').checked = p.engineOn; }
     if(p.header){ document.getElementById('customer').value=p.header.customer||''; document.getElementById('manager').value=p.header.manager||''; document.getElementById('notes').value=p.header.notes||''; }
